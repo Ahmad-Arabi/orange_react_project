@@ -1,7 +1,7 @@
 React Social Media App Demo 
 
-[composer install]
+--[composer install]
 
-[npm install]
+--[npm install]
 
-[npm install axios]
+--[npm install axios]
