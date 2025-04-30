@@ -4,7 +4,7 @@ const Footer = () => {
     return (
         <footer>
             <div className="footer-content">
-                <p>&copy; {new Date().getFullYear()} Your Company Name. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} Threadly. All rights reserved.</p>
                 <ul className="footer-links">
                     <li><a href="/privacy-policy">Privacy Policy</a></li>
                     <li><a href="/terms-of-service">Terms of Service</a></li>

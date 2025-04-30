@@ -1,48 +1,44 @@
 import api from './api';
 
-const authService = {
-  register: async (userData) => {
-    const response = await api.post('/register', userData);
+export const register = async (userData) => {
+  try {
+    const response = await api.post('/register', {
+      name: userData.username,
+      email: userData.email,
+      password: userData.password,
+      password_confirmation: userData.confirmPassword
+    });
+    
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
     }
-    return response.data;
-  },
-
-  login: async (credentials) => {
-    const response = await api.post('/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
-  },
-  
-  logout: async () => {
-    const response = await api.post('/logout');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    return response.data;
-  },
-
-  getUserInfo: async () => {
-    const response = await api.get('/user');
-    return response.data;
-  },
-
-  updateUserInfo: async (userData) => {
-    const response = await api.put('/user', userData);
-    return response.data;
-  },
-  
-  getCurrentUser: () => {
-    return JSON.parse(localStorage.getItem('user'));
-  },
-  
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
+    
+    return response;
+  } catch (error) {
+    throw error.response?.data || error.message;
   }
 };
 
-export default authService;
+export const login = async (credentials) => {
+  try {
+    const response = await api.post('/login', credentials);
+    
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    
+    return response;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const logout = async () => {
+  try {
+    await api.post('/logout');
+    localStorage.removeItem('token');
+  } catch (error) {
+    console.error('Logout failed:', error);
+    localStorage.removeItem('token');
+  }
+};

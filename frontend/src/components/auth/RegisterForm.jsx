@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../../store/authSlice';
 
 const RegisterForm = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { loading, error } = useSelector((state) => state.auth);
+    
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -16,16 +23,21 @@ const RegisterForm = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle registration logic here
-        console.log('Registration data:', formData);
+        
+        try {
+            await dispatch(registerUser(formData)).unwrap();
+            navigate('/profile');
+        } catch (err) {
+            console.error('Registration failed:', err);
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label htmlFor="username">Username</label>
+        <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+                <label htmlFor="username">Name</label>
                 <input
                     type="text"
                     id="username"
@@ -33,9 +45,10 @@ const RegisterForm = () => {
                     value={formData.username}
                     onChange={handleChange}
                     required
+                    className="form-control"
                 />
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="email">Email</label>
                 <input
                     type="email"
@@ -44,9 +57,10 @@ const RegisterForm = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
+                    className="form-control"
                 />
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <input
                     type="password"
@@ -55,9 +69,10 @@ const RegisterForm = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    className="form-control"
                 />
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="confirmPassword">Confirm Password</label>
                 <input
                     type="password"
@@ -66,9 +81,13 @@ const RegisterForm = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
+                    className="form-control"
                 />
             </div>
-            <button type="submit">Register</button>
+            {error && <div className="error-message">{error}</div>}
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Registering...' : 'Register'}
+            </button>
         </form>
     );
 };

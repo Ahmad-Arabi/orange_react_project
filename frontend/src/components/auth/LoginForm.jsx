@@ -1,55 +1,68 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../../store/authSlice';
 
 const LoginForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { loading, error } = useSelector((state) => state.auth);
+    
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add login logic here
-        if (!email || !password) {
-            setError('Please fill in all fields');
-            return;
+        
+        try {
+            await dispatch(loginUser(formData)).unwrap();
+            navigate('/profile');
+        } catch (err) {
+            console.error('Login failed:', err);
         }
-        // Call the authentication service to log in the user
-        // authService.login(email, password)
-        //     .then(response => {
-        //         // Handle successful login
-        //     })
-        //     .catch(err => {
-        //         setError('Login failed. Please try again.');
-        //     });
     };
 
     return (
-        <div className="login-form">
-            <h2>Login</h2>
-            {error && <p className="error">{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit">Login</button>
-            </form>
-        </div>
+        <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="form-control"
+                />
+            </div>
+            <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="form-control"
+                />
+            </div>
+            {error && <div className="error-message">{error}</div>}
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+            </button>
+        </form>
     );
 };
 
